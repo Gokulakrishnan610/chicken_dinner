@@ -1,36 +1,59 @@
+
 import { User, Mail, Phone, MapPin, Calendar, Edit, Camera } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
+
+
+const mockStudentInfo = {
+  name: "Sarah Johnson",
+  email: "sarah.johnson@university.edu",
+  phone: "+1 (555) 123-4567",
+  location: "Boston, MA",
+  university: "MIT",
+  major: "Computer Science",
+  year: "Senior",
+  gpa: "3.85",
+  joinDate: "September 2021",
+  bio: "Passionate computer science student with a focus on full-stack development and machine learning. Always eager to learn new technologies and contribute to innovative projects.",
+};
+
+const mockSkills = [
+  { name: "JavaScript", level: "Advanced", category: "Programming" },
+  { name: "React", level: "Advanced", category: "Frontend" },
+  { name: "Python", level: "Intermediate", category: "Programming" },
+  { name: "AWS", level: "Intermediate", category: "Cloud" },
+  { name: "Machine Learning", level: "Beginner", category: "AI/ML" },
+  { name: "Node.js", level: "Intermediate", category: "Backend" },
+];
+
+const mockInterests = [
+  "Web Development", "Artificial Intelligence", "Cloud Computing", 
+  "Open Source", "Volunteering", "Photography", "Travel", "Reading"
+];
 
 const Profile = () => {
-  const studentInfo = {
-    name: "Sarah Johnson",
-    email: "sarah.johnson@university.edu",
-    phone: "+1 (555) 123-4567",
-    location: "Boston, MA",
-    university: "MIT",
-    major: "Computer Science",
-    year: "Senior",
-    gpa: "3.85",
-    joinDate: "September 2021",
-    bio: "Passionate computer science student with a focus on full-stack development and machine learning. Always eager to learn new technologies and contribute to innovative projects.",
-  };
+  const { user } = useAuth();
 
-  const skills = [
-    { name: "JavaScript", level: "Advanced", category: "Programming" },
-    { name: "React", level: "Advanced", category: "Frontend" },
-    { name: "Python", level: "Intermediate", category: "Programming" },
-    { name: "AWS", level: "Intermediate", category: "Cloud" },
-    { name: "Machine Learning", level: "Beginner", category: "AI/ML" },
-    { name: "Node.js", level: "Intermediate", category: "Backend" },
-  ];
+  // If user is present, use real data, else use mock data
+  const studentInfo = user && user.profile ? {
+    name: `${user.first_name} ${user.last_name}`,
+    email: user.email,
+    phone: user.profile.phone || "N/A",
+    location: user.profile.address || "N/A",
+    university: user.profile.department || "N/A",
+    major: user.profile.department || "N/A",
+    year: "N/A",
+    gpa: "N/A",
+    joinDate: user.profile.date_of_birth || "N/A",
+    bio: user.profile.bio || "",
+  } : mockStudentInfo;
 
-  const interests = [
-    "Web Development", "Artificial Intelligence", "Cloud Computing", 
-    "Open Source", "Volunteering", "Photography", "Travel", "Reading"
-  ];
+  // You can extend this to use real skills/interests if available from backend
+  const skills = mockSkills;
+  const interests = mockInterests;
 
   const getLevelColor = (level: string) => {
     switch (level) {

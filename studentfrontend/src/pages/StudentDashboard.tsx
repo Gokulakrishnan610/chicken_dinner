@@ -7,10 +7,32 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { useAchievements, useVolunteeringActivities, useCreateVolunteeringActivity } from "@/hooks/useApi";
 
 const StudentDashboard = () => {
   const [isVolunteeringModalOpen, setIsVolunteeringModalOpen] = useState(false);
   const { toast } = useToast();
+  const { user, isAuthenticated } = useAuth();
+  
+  // API hooks
+  const { data: achievementsData, isLoading: achievementsLoading } = useAchievements({ page: 1 });
+  const { data: volunteeringData, isLoading: volunteeringLoading } = useVolunteeringActivities({ page: 1 });
+  const createVolunteeringMutation = useCreateVolunteeringActivity({
+    onSuccess: () => {
+      toast({
+        title: "Volunteering Activity Logged",
+        description: "Your volunteering activity has been successfully added.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to log volunteering activity. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const recentAchievements = [
     {
@@ -54,21 +76,16 @@ const StudentDashboard = () => {
   ];
 
   const handleLogVolunteering = (data: any) => {
-    // Here you would typically send the data to your backend
-    console.log("Volunteering data:", data);
-    
-    // For now, we'll just show a success message
-    toast({
-      title: "Volunteering Activity Logged",
-      description: `${data.title} has been successfully added to your achievements.`,
-    });
+    createVolunteeringMutation.mutate(data);
   };
 
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Welcome Section */}
       <div className="space-y-3">
-        <h1 className="text-3xl font-semibold tracking-tight">Welcome back, Sarah!</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">
+          Welcome back, {user ? `${user.first_name} ${user.last_name}` : "Sarah"}!
+        </h1>
         <p className="text-muted-foreground text-lg">
           Track your academic achievements and build your professional portfolio.
         </p>
@@ -77,33 +94,33 @@ const StudentDashboard = () => {
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
-          title="Total Certificates"
-          value="24"
-          change="+3 this month"
+          title="Total Achievements"
+          value={achievementsData?.count || 0}
+          change={achievementsLoading ? "Loading..." : "+2 this month"}
           changeType="positive"
           icon={Award}
           gradient
         />
         <StatsCard
-          title="Projects Completed"
-          value="12"
-          change="+2 this week"
+          title="Certificates"
+          value="8"
+          change="+1 this week"
           changeType="positive"
           icon={BookOpen}
         />
         <StatsCard
-          title="Achievement Score"
-          value="1,247"
-          change="+125 points"
+          title="Total Points"
+          value={achievementsData?.results?.reduce((sum, achievement) => sum + achievement.points, 0) || 0}
+          change="+150 this month"
           changeType="positive"
           icon={Trophy}
         />
         <StatsCard
-          title="Portfolio Views"
-          value="89"
-          change="+12% this month"
+          title="Volunteering Hours"
+          value={volunteeringData?.results?.reduce((sum, activity) => sum + activity.hours, 0) || 0}
+          change={volunteeringLoading ? "Loading..." : "+5 this week"}
           changeType="positive"
-          icon={TrendingUp}
+          icon={Users}
         />
       </div>
 
@@ -123,7 +140,9 @@ const StudentDashboard = () => {
             </div>
 
             <div className="space-y-3">
-              {recentAchievements.map((achievement) => (
+              {achievementsLoading ? (
+                <div className="text-center py-4 text-muted-foreground">Loading achievements...</div>
+              ) : achievementsData?.results?.slice(0, 4).map((achievement) => (
                 <div
                   key={achievement.id}
                   className="flex items-start gap-4 p-4 border rounded-lg hover:bg-accent/60 transition-all duration-200 hover:shadow-sm"
@@ -135,28 +154,28 @@ const StudentDashboard = () => {
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-sm leading-tight">{achievement.title}</p>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                      <span>{achievement.type}</span>
+                      <span>{achievement.category}</span>
                       <span>•</span>
-                      <span>{achievement.date}</span>
+                      <span>{new Date(achievement.date_achieved).toLocaleDateString()}</span>
                     </div>
                   </div>
 
                   <div className="flex flex-col items-end gap-1">
                     <Badge 
-                      variant={achievement.status === "approved" ? "default" : "secondary"}
+                      variant={achievement.verified ? "default" : "secondary"}
                       className="text-xs font-medium"
                     >
                       +{achievement.points} pts
                     </Badge>
                     <Badge 
-                      variant={achievement.status === "approved" ? "default" : "secondary"}
+                      variant={achievement.verified ? "default" : "secondary"}
                       className="text-xs"
                     >
-                      {achievement.status}
+                      {achievement.verified ? "verified" : "pending"}
                     </Badge>
                   </div>
                 </div>
-              ))}
+              )) || []}
             </div>
           </div>
         </Card>

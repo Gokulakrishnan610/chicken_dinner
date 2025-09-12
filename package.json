@@ -1,0 +1,32 @@
+{
+  "name": "eduportal-integration",
+  "version": "1.0.0",
+  "description": "Educational Portal with Student, Faculty, and Admin frontends integrated with Django backend",
+  "scripts": {
+    "setup": "./setup-integration.sh",
+    "start:backend": "./start-backend.sh",
+    "start:student": "./start-student.sh",
+    "start:admin": "./start-admin.sh",
+    "start:faculty": "./start-faculty.sh",
+    "start:all": "./start-all.sh",
+    "install:all": "cd studentfrontend && npm install && cd ../adminfrontend && npm install && cd ../facultyfrontend && npm install",
+    "build:all": "cd studentfrontend && npm run build && cd ../adminfrontend && npm run build && cd ../facultyfrontend && npm run build",
+    "dev": "npm run start:all"
+  },
+  "keywords": [
+    "education",
+    "portal",
+    "django",
+    "react",
+    "typescript",
+    "student",
+    "faculty",
+    "admin"
+  ],
+  "author": "EduPortal Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "python": ">=3.8.0"
+  }
+}

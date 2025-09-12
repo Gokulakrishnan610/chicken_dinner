@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   GraduationCap, 
   BarChart3, 
@@ -10,15 +10,38 @@ import {
   Award,
   FileText,
   Menu,
-  X
+  X,
+  LogOut
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import ThemeToggle from "./ThemeToggle";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast({
+        title: "Logged out successfully",
+        description: "You have been logged out of your account.",
+      });
+      navigate('/login');
+    } catch (error) {
+      toast({
+        title: "Logout failed",
+        description: "There was an error logging out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const navigationItems = [
     { 
@@ -112,6 +135,19 @@ const Navigation = () => {
           ))}
         </nav>
 
+        {/* User Info */}
+        <div className="p-4 border-t">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+              <User className="h-4 w-4 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{user?.full_name || 'Student'}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email || 'student@example.com'}</p>
+            </div>
+          </div>
+        </div>
+
         {/* Bottom Actions */}
         <div className="absolute bottom-4 left-4 right-4 space-y-1">
           <div className="flex items-center justify-between mb-2">
@@ -125,6 +161,14 @@ const Navigation = () => {
           <Button variant="ghost" className="w-full justify-start text-sm font-medium">
             <Settings className="h-4 w-4 mr-3" />
             Settings
+          </Button>
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start text-sm font-medium text-destructive hover:text-destructive"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-4 w-4 mr-3" />
+            Logout
           </Button>
         </div>
       </aside>
