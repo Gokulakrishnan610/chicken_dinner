@@ -1,0 +1,253 @@
+[
+  {
+    "model": "achievements.achievementcategory",
+    "pk": 1,
+    "fields": {
+      "name": "Academic Excellence",
+      "description": "Achievements related to academic performance and excellence",
+      "icon": "graduation-cap",
+      "color": "#3B82F6",
+      "points_multiplier": 1.5,
+      "is_active": true
+    }
+  },
+  {
+    "model": "achievements.achievementcategory",
+    "pk": 2,
+    "fields": {
+      "name": "Leadership",
+      "description": "Leadership roles and responsibilities",
+      "icon": "users",
+      "color": "#10B981",
+      "points_multiplier": 2.0,
+      "is_active": true
+    }
+  },
+  {
+    "model": "achievements.achievementcategory",
+    "pk": 3,
+    "fields": {
+      "name": "Innovation",
+      "description": "Innovative projects and creative solutions",
+      "icon": "lightbulb",
+      "color": "#F59E0B",
+      "points_multiplier": 2.5,
+      "is_active": true
+    }
+  },
+  {
+    "model": "achievements.achievementcategory",
+    "pk": 4,
+    "fields": {
+      "name": "Community Service",
+      "description": "Community service and social impact",
+      "icon": "heart",
+      "color": "#EF4444",
+      "points_multiplier": 1.8,
+      "is_active": true
+    }
+  },
+  {
+    "model": "certificates.certificatecategory",
+    "pk": 1,
+    "fields": {
+      "name": "Technical Skills",
+      "description": "Technical and programming certifications",
+      "icon": "code",
+      "color": "#8B5CF6",
+      "points_value": 15,
+      "is_active": true
+    }
+  },
+  {
+    "model": "certificates.certificatecategory",
+    "pk": 2,
+    "fields": {
+      "name": "Cloud Computing",
+      "description": "Cloud platform certifications",
+      "icon": "cloud",
+      "color": "#06B6D4",
+      "points_value": 20,
+      "is_active": true
+    }
+  },
+  {
+    "model": "certificates.certificatecategory",
+    "pk": 3,
+    "fields": {
+      "name": "Data Science",
+      "description": "Data science and analytics certifications",
+      "icon": "bar-chart",
+      "color": "#10B981",
+      "points_value": 18,
+      "is_active": true
+    }
+  },
+  {
+    "model": "certificates.certificatecategory",
+    "pk": 4,
+    "fields": {
+      "name": "Project Management",
+      "description": "Project management certifications",
+      "icon": "clipboard",
+      "color": "#F59E0B",
+      "points_value": 12,
+      "is_active": true
+    }
+  },
+  {
+    "model": "volunteering.volunteeringcategory",
+    "pk": 1,
+    "fields": {
+      "name": "Community Service",
+      "description": "General community service activities",
+      "icon": "users",
+      "color": "#3B82F6",
+      "points_per_hour": 1.0,
+      "is_active": true
+    }
+  },
+  {
+    "model": "volunteering.volunteeringcategory",
+    "pk": 2,
+    "fields": {
+      "name": "Environmental",
+      "description": "Environmental conservation and sustainability",
+      "icon": "leaf",
+      "color": "#10B981",
+      "points_per_hour": 1.2,
+      "is_active": true
+    }
+  },
+  {
+    "model": "volunteering.volunteeringcategory",
+    "pk": 3,
+    "fields": {
+      "name": "Education",
+      "description": "Educational support and tutoring",
+      "icon": "book-open",
+      "color": "#8B5CF6",
+      "points_per_hour": 1.5,
+      "is_active": true
+    }
+  },
+  {
+    "model": "volunteering.volunteeringcategory",
+    "pk": 4,
+    "fields": {
+      "name": "Healthcare",
+      "description": "Healthcare and medical support",
+      "icon": "heart",
+      "color": "#EF4444",
+      "points_per_hour": 2.0,
+      "is_active": true
+    }
+  },
+  {
+    "model": "notifications.notificationtype",
+    "pk": 1,
+    "fields": {
+      "name": "achievement",
+      "description": "Achievement-related notifications",
+      "icon": "trophy",
+      "color": "#F59E0B",
+      "is_active": true
+    }
+  },
+  {
+    "model": "notifications.notificationtype",
+    "pk": 2,
+    "fields": {
+      "name": "certificate",
+      "description": "Certificate-related notifications",
+      "icon": "certificate",
+      "color": "#10B981",
+      "is_active": true
+    }
+  },
+  {
+    "model": "notifications.notificationtype",
+    "pk": 3,
+    "fields": {
+      "name": "volunteering",
+      "description": "Volunteering-related notifications",
+      "icon": "heart",
+      "color": "#EF4444",
+      "is_active": true
+    }
+  },
+  {
+    "model": "notifications.notificationtype",
+    "pk": 4,
+    "fields": {
+      "name": "system",
+      "description": "System notifications",
+      "icon": "bell",
+      "color": "#6B7280",
+      "is_active": true
+    }
+  },
+  {
+    "model": "notifications.notificationtype",
+    "pk": 5,
+    "fields": {
+      "name": "reminder",
+      "description": "Reminder notifications",
+      "icon": "clock",
+      "color": "#3B82F6",
+      "is_active": true
+    }
+  },
+  {
+    "model": "reports.reporttemplate",
+    "pk": 1,
+    "fields": {
+      "name": "User Summary Report",
+      "description": "Comprehensive summary of user activities and achievements",
+      "report_type": "user_summary",
+      "fields": ["user_info", "achievements", "certificates", "volunteering", "statistics"],
+      "filters": {"date_range": true, "category": true, "status": true},
+      "is_active": true,
+      "created_by": 1
+    }
+  },
+  {
+    "model": "reports.reporttemplate",
+    "pk": 2,
+    "fields": {
+      "name": "Achievement Report",
+      "description": "Detailed report of user achievements",
+      "report_type": "achievement_report",
+      "fields": ["achievements", "categories", "points", "timeline"],
+      "filters": {"date_range": true, "category": true, "status": true},
+      "is_active": true,
+      "created_by": 1
+    }
+  },
+  {
+    "model": "reports.reporttemplate",
+    "pk": 3,
+    "fields": {
+      "name": "Certificate Report",
+      "description": "Report of user certificates and certifications",
+      "report_type": "certificate_report",
+      "fields": ["certificates", "categories", "issuers", "expiry_dates"],
+      "filters": {"date_range": true, "category": true, "status": true},
+      "is_active": true,
+      "created_by": 1
+    }
+  },
+  {
+    "model": "reports.reporttemplate",
+    "pk": 4,
+    "fields": {
+      "name": "Volunteering Report",
+      "description": "Report of volunteering activities and impact",
+      "report_type": "volunteering_report",
+      "fields": ["activities", "hours", "organizations", "impact"],
+      "filters": {"date_range": true, "category": true, "organization": true},
+      "is_active": true,
+      "created_by": 1
+    }
+  }
+]
