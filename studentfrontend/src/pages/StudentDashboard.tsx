@@ -79,9 +79,102 @@ const StudentDashboard = () => {
     createVolunteeringMutation.mutate(data);
   };
 
+  // Demo: Mock data for peers and mentors
+  const mockPeers = [
+    { id: 1, name: "Alice Lee", skills: ["React", "Python"], specialization: "Web Development" },
+    { id: 2, name: "Bob Smith", skills: ["AWS", "Node.js"], specialization: "Cloud Computing" },
+  ];
+  const mockMentors = [
+    { id: 101, name: "Dr. Emily Carter", skills: ["Machine Learning", "Python"], specialization: "AI/ML" },
+    { id: 102, name: "Prof. David Kim", skills: ["React", "Node.js"], specialization: "Full Stack" },
+  ];
+  const [showMatchModal, setShowMatchModal] = useState(false);
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [chatMessages, setChatMessages] = useState([
+    { sender: "them", text: "Hi! Ready to collaborate?" },
+    { sender: "me", text: "Yes, let's get started!" },
+  ]);
+  const [newMessage, setNewMessage] = useState("");
+
+  const handleSendMessage = () => {
+    if (newMessage.trim()) {
+      setChatMessages([...chatMessages, { sender: "me", text: newMessage }]);
+      setNewMessage("");
+    }
+  };
+
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Welcome Section */}
+      {/* Peer/Mentor Matching Demo */}
+      {/* <div>
+        <button
+          className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80"
+          onClick={() => setShowMatchModal(true)}
+        >
+          Find Peers & Mentors
+        </button>
+      </div>
+
+      {showMatchModal && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative">
+            <button className="absolute top-2 right-2 text-xl" onClick={() => { setShowMatchModal(false); setSelectedChat(null); }}>&times;</button>
+            {!selectedChat ? (
+              <>
+                <h2 className="text-xl font-bold mb-4">Matched Peers</h2>
+                <ul className="mb-6">
+                  {mockPeers.map(peer => (
+                    <li key={peer.id} className="mb-2 flex justify-between items-center border-b pb-2">
+                      <span>
+                        <span className="font-medium">{peer.name}</span> <span className="text-xs text-muted-foreground">({peer.specialization})</span>
+                        <span className="ml-2 text-xs text-muted-foreground">Skills: {peer.skills.join(", ")}</span>
+                      </span>
+                      <button className="text-primary underline" onClick={() => setSelectedChat({ ...peer, type: 'peer' })}>Chat</button>
+                    </li>
+                  ))}
+                </ul>
+                <h2 className="text-xl font-bold mb-4">Matched Mentors</h2>
+                <ul>
+                  {mockMentors.map(mentor => (
+                    <li key={mentor.id} className="mb-2 flex justify-between items-center border-b pb-2">
+                      <span>
+                        <span className="font-medium">{mentor.name}</span> <span className="text-xs text-muted-foreground">({mentor.specialization})</span>
+                        <span className="ml-2 text-xs text-muted-foreground">Skills: {mentor.skills.join(", ")}</span>
+                      </span>
+                      <button className="text-primary underline" onClick={() => setSelectedChat({ ...mentor, type: 'mentor' })}>Chat</button>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <div>
+                <button className="mb-2 text-sm text-primary underline" onClick={() => setSelectedChat(null)}>&larr; Back to matches</button>
+                <h3 className="font-bold mb-2">Chat with {selectedChat.name} ({selectedChat.type})</h3>
+                <div className="border rounded p-2 h-40 overflow-y-auto bg-gray-50 mb-2">
+                  {chatMessages.map((msg, idx) => (
+                    <div key={idx} className={msg.sender === "me" ? "text-right" : "text-left"}>
+                      <span className={msg.sender === "me" ? "bg-primary text-white px-2 py-1 rounded inline-block my-1" : "bg-gray-200 px-2 py-1 rounded inline-block my-1"}>
+                        {msg.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    className="flex-1 border rounded px-2 py-1"
+                    value={newMessage}
+                    onChange={e => setNewMessage(e.target.value)}
+                    placeholder="Type a message..."
+                  />
+                  <button className="bg-primary text-white px-3 py-1 rounded" onClick={handleSendMessage}>
+                    Send
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )} */}
       <div className="space-y-3">
         <h1 className="text-3xl font-semibold tracking-tight">
           Welcome back, {user ? `${user.first_name} ${user.last_name}` : "Sarah"}!
@@ -89,7 +182,7 @@ const StudentDashboard = () => {
         <p className="text-muted-foreground text-lg">
           Track your academic achievements and build your professional portfolio.
         </p>
-      </div>
+      </div> 
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

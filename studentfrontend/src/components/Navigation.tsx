@@ -5,6 +5,7 @@ import {
   BarChart3, 
   Upload, 
   User, 
+  Users,
   Settings,
   Bell,
   Award,
@@ -68,11 +69,23 @@ const Navigation = () => {
       path: "/portfolio", 
       badge: null 
     },
+    {
+      icon: Users,
+      label: "Find Peers & Mentors",
+      path: "/match",
+      badge: null
+    },
     { 
       icon: User, 
       label: "Profile", 
       path: "/profile", 
       badge: null 
+    },
+    {
+      icon: BarChart3,
+      label: "Level Up",
+      path: "/levelup",
+      badge: null
     },
   ];
 

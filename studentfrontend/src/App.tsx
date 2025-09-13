@@ -1,3 +1,4 @@
+import LevelUpPage from "./pages/LevelUpPage";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +14,7 @@ import CertificateUpload from "./components/CertificateUpload";
 import Achievements from "./pages/Achievements";
 import Portfolio from "./pages/Portfolio";
 import Profile from "./pages/Profile";
+import MatchPage from "./pages/MatchPage";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 
@@ -79,6 +81,22 @@ const App = () => (
                   <Navigation />
                   <main className="md:ml-64 p-6">
                     <Profile />
+                  </main>
+                </ProtectedRoute>
+              } />
+              <Route path="/match" element={
+                <ProtectedRoute requiredRole="student">
+                  <Navigation />
+                  <main className="md:ml-64 p-6">
+                    <MatchPage />
+                  </main>
+                </ProtectedRoute>
+              } />
+              <Route path="/levelup" element={
+                <ProtectedRoute requiredRole="student">
+                  <Navigation />
+                  <main className="md:ml-64 p-6">
+                    <LevelUpPage />
                   </main>
                 </ProtectedRoute>
               } />
