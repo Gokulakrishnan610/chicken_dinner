@@ -84,7 +84,7 @@ class CertificateCreateSerializer(serializers.ModelSerializer):
         model = Certificate
         fields = [
             'title', 'description', 'category', 'issuer', 'issue_date', 'expiry_date',
-            'certificate_number', 'priority', 'certificate_file', 'skills_verified', 'tags', 'is_public'
+            'certificate_number', 'priority', 'points', 'certificate_file', 'skills_verified', 'tags', 'is_public'
         ]
     
     def create(self, validated_data):

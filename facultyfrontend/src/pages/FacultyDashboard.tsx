@@ -6,8 +6,6 @@ import {
   XCircle, 
   Eye, 
   MessageSquare,
-  Filter,
-  Search,
   Calendar,
   User,
   Award
@@ -17,12 +15,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatsCard from "@/components/StatsCard";
+import { isDemoAccount } from "@/utils/demoUtils";
+import { useAuth } from "@/contexts/AuthContext";
+import { facultyReviewAPI } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 
 const FacultyDashboard = () => {
-  const [selectedDocument, setSelectedDocument] = useState(null);
   const [showDocumentViewer, setShowDocumentViewer] = useState(false);
+  const { user } = useAuth();
 
-  const pendingApprovals = [
+  // Mock data for demo accounts only
+  const mockPendingApprovals = [
     {
       id: 1,
       studentName: "Sarah Johnson",
@@ -69,7 +72,7 @@ const FacultyDashboard = () => {
     }
   ];
 
-  const recentApprovals = [
+  const mockRecentApprovals = [
     {
       id: 5,
       studentName: "Lisa Wang",
@@ -90,6 +93,47 @@ const FacultyDashboard = () => {
       comments: "Portfolio needs more detailed project descriptions"
     }
   ];
+
+  // API calls for real data
+  const { data: pendingAchievements, isLoading: achievementsLoading } = useQuery({
+    queryKey: ['pending-achievements'],
+    queryFn: () => facultyReviewAPI.getPendingAchievements(),
+    enabled: !isDemoAccount(user),
+  });
+
+  const { data: pendingCertificates, isLoading: certificatesLoading } = useQuery({
+    queryKey: ['pending-certificates'],
+    queryFn: () => facultyReviewAPI.getPendingCertificates(),
+    enabled: !isDemoAccount(user),
+  });
+
+  // Use mock data only for demo accounts, otherwise use real data
+  const pendingApprovals = isDemoAccount(user) ? mockPendingApprovals : [
+    ...(pendingAchievements?.results || []).map(achievement => ({
+      id: achievement.id,
+      studentName: `${achievement.user_name || 'Unknown'}`,
+      studentId: `ID-${achievement.user}`,
+      documentType: achievement.title,
+      submittedDate: new Date(achievement.created_at).toLocaleDateString(),
+      category: achievement.category_name || 'Achievement',
+      status: achievement.status,
+      priority: achievement.priority || 'medium',
+      fileUrl: achievement.evidence_file_url || achievement.evidence_url,
+    })),
+    ...(pendingCertificates?.results || []).map(certificate => ({
+      id: certificate.id + 10000, // Offset to avoid ID conflicts
+      studentName: `${certificate.user_name || 'Unknown'}`,
+      studentId: `ID-${certificate.user}`,
+      documentType: certificate.title,
+      submittedDate: new Date(certificate.created_at).toLocaleDateString(),
+      category: certificate.category_name || 'Certificate',
+      status: certificate.status,
+      priority: certificate.priority || 'medium',
+      fileUrl: certificate.certificate_file_url || certificate.certificate_url,
+    })),
+  ];
+  
+  const recentApprovals = isDemoAccount(user) ? mockRecentApprovals : [];
 
   const handleApprove = (documentId: number) => {
     console.log("Approved document:", documentId);
@@ -167,7 +211,15 @@ const FacultyDashboard = () => {
         <TabsContent value="pending" className="space-y-6">
           {/* Pending Approvals List */}
           <div className="grid gap-4">
-            {pendingApprovals.map((item) => (
+            {(achievementsLoading || certificatesLoading) ? (
+              <div className="text-center py-4 text-muted-foreground">Loading pending approvals...</div>
+            ) : pendingApprovals.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No pending approvals</p>
+              </div>
+            ) : (
+              pendingApprovals.map((item) => (
               <Card key={item.id} className="portal-card p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4 flex-1">
@@ -209,7 +261,7 @@ const FacultyDashboard = () => {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => setSelectedDocument(item)}
+                      onClick={() => setShowDocumentViewer(true)}
                     >
                       <MessageSquare className="h-4 w-4 mr-2" />
                       Review
@@ -233,7 +285,8 @@ const FacultyDashboard = () => {
                   </div>
                 </div>
               </Card>
-            ))}
+              ))
+            )}
           </div>
         </TabsContent>
 

@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import StudentDashboard from "./pages/StudentDashboard";
 import CertificateUpload from "./components/CertificateUpload";
 import Achievements from "./pages/Achievements";
+import Certificates from "./pages/Certificates";
 import Portfolio from "./pages/Portfolio";
 import Profile from "./pages/Profile";
 import MatchPage from "./pages/MatchPage";
@@ -52,19 +53,19 @@ const App = () => (
                   </main>
                 </ProtectedRoute>
               } />
-              <Route path="/upload" element={
-                <ProtectedRoute requiredRole="student">
-                  <Navigation />
-                  <main className="md:ml-64 p-6">
-                    <CertificateUpload />
-                  </main>
-                </ProtectedRoute>
-              } />
               <Route path="/achievements" element={
                 <ProtectedRoute requiredRole="student">
                   <Navigation />
                   <main className="md:ml-64 p-6">
                     <Achievements />
+                  </main>
+                </ProtectedRoute>
+              } />
+              <Route path="/certificates" element={
+                <ProtectedRoute requiredRole="student">
+                  <Navigation />
+                  <main className="md:ml-64 p-6">
+                    <Certificates />
                   </main>
                 </ProtectedRoute>
               } />

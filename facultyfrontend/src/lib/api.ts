@@ -89,13 +89,21 @@ export interface Achievement {
   id: number;
   title: string;
   description: string;
-  category: string;
-  date_achieved: string;
-  verified: boolean;
+  category: number;
+  category_name: string;
+  status: 'pending' | 'approved' | 'rejected';
+  priority: 'low' | 'medium' | 'high';
+  points: number;
+  evidence_url?: string;
+  evidence_file_url?: string;
+  skills_gained: string[];
+  tags: string[];
+  is_public: boolean;
+  user: number;
+  user_name: string;
   verified_by?: number;
   verified_at?: string;
-  points: number;
-  student: number;
+  rejection_reason?: string;
   created_at: string;
   updated_at: string;
 }
@@ -104,11 +112,27 @@ export interface Certificate {
   id: number;
   title: string;
   description: string;
-  certificate_file: string;
-  verified: boolean;
+  category: number;
+  category_name: string;
+  issuer: string;
+  issue_date: string;
+  expiry_date?: string;
+  certificate_number?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  priority: 'low' | 'medium' | 'high';
+  points: number;
+  certificate_file?: string;
+  certificate_file_url?: string;
+  certificate_url?: string;
+  skills_verified: string[];
+  tags: string[];
+  is_public: boolean;
+  is_expired: boolean;
+  user: number;
+  user_name: string;
   verified_by?: number;
   verified_at?: string;
-  student: number;
+  rejection_reason?: string;
   created_at: string;
   updated_at: string;
 }
@@ -193,101 +217,140 @@ export const authAPI = {
   },
   
   getCurrentUser: async (): Promise<User> => {
-    const response = await apiClient.get('/accounts/profile/');
+    const response = await apiClient.get('/auth/profile/');
     return response.data;
   },
 };
 
 // Faculty Review API
 export const facultyReviewAPI = {
-  getPendingReviews: async (params?: {
+  getPendingAchievements: async (params?: {
     page?: number;
-    type?: 'achievement' | 'certificate' | 'volunteering';
-  }): Promise<{ results: any[]; count: number; next?: string; previous?: string }> => {
-    const response = await apiClient.get('/faculty/pending-reviews/', { params });
+  }): Promise<{ results: Achievement[]; count: number; next?: string; previous?: string }> => {
+    const response = await apiClient.get('/achievements/', { params: { ...params, status: 'pending' } });
     return response.data;
   },
   
-  getReviewHistory: async (params?: {
+  getPendingCertificates: async (params?: {
     page?: number;
-    type?: 'achievement' | 'certificate' | 'volunteering';
-    status?: 'approved' | 'rejected';
-  }): Promise<{ results: any[]; count: number; next?: string; previous?: string }> => {
-    const response = await apiClient.get('/faculty/review-history/', { params });
+  }): Promise<{ results: Certificate[]; count: number; next?: string; previous?: string }> => {
+    const response = await apiClient.get('/certificates/pending-reviews/', { params });
     return response.data;
   },
   
-  approveAchievement: async (id: number, feedback?: string): Promise<Achievement> => {
-    const response = await apiClient.post(`/achievements/${id}/approve/`, { feedback });
+  getPendingVolunteeringActivities: async (params?: {
+    page?: number;
+  }): Promise<{ results: VolunteeringActivity[]; count: number; next?: string; previous?: string }> => {
+    const response = await apiClient.get('/volunteering/pending-reviews/', { params });
     return response.data;
   },
   
-  rejectAchievement: async (id: number, reason: string): Promise<Achievement> => {
-    const response = await apiClient.post(`/achievements/${id}/reject/`, { reason });
+  approveAchievement: async (id: number, reviewNotes?: string): Promise<{ message: string }> => {
+    const response = await apiClient.patch(`/achievements/${id}/approve/`, { 
+      action: 'approve',
+      review_notes: reviewNotes 
+    });
     return response.data;
   },
   
-  approveCertificate: async (id: number, feedback?: string): Promise<Certificate> => {
-    const response = await apiClient.post(`/certificates/${id}/approve/`, { feedback });
+  rejectAchievement: async (id: number, rejectionReason: string, reviewNotes?: string): Promise<{ message: string }> => {
+    const response = await apiClient.patch(`/achievements/${id}/approve/`, { 
+      action: 'reject',
+      rejection_reason: rejectionReason,
+      review_notes: reviewNotes 
+    });
     return response.data;
   },
   
-  rejectCertificate: async (id: number, reason: string): Promise<Certificate> => {
-    const response = await apiClient.post(`/certificates/${id}/reject/`, { reason });
+  approveCertificate: async (id: number, reviewNotes?: string): Promise<{ message: string }> => {
+    const response = await apiClient.patch(`/certificates/${id}/approve/`, { 
+      action: 'approve',
+      review_notes: reviewNotes 
+    });
     return response.data;
   },
   
-  approveVolunteeringActivity: async (id: number, feedback?: string): Promise<VolunteeringActivity> => {
-    const response = await apiClient.post(`/volunteering/${id}/approve/`, { feedback });
+  rejectCertificate: async (id: number, rejectionReason: string, reviewNotes?: string): Promise<{ message: string }> => {
+    const response = await apiClient.patch(`/certificates/${id}/approve/`, { 
+      action: 'reject',
+      rejection_reason: rejectionReason,
+      review_notes: reviewNotes 
+    });
     return response.data;
   },
   
-  rejectVolunteeringActivity: async (id: number, reason: string): Promise<VolunteeringActivity> => {
-    const response = await apiClient.post(`/volunteering/${id}/reject/`, { reason });
+  approveVolunteeringActivity: async (id: number, reviewNotes?: string): Promise<{ message: string }> => {
+    const response = await apiClient.patch(`/volunteering/activities/${id}/approve/`, { 
+      action: 'approve',
+      review_notes: reviewNotes 
+    });
+    return response.data;
+  },
+  
+  rejectVolunteeringActivity: async (id: number, rejectionReason: string, reviewNotes?: string): Promise<{ message: string }> => {
+    const response = await apiClient.patch(`/volunteering/activities/${id}/approve/`, { 
+      action: 'reject',
+      rejection_reason: rejectionReason,
+      review_notes: reviewNotes 
+    });
     return response.data;
   },
   
   getStudentAchievements: async (studentId: number, params?: {
     page?: number;
-    verified?: boolean;
+    status?: string;
   }): Promise<{ results: Achievement[]; count: number; next?: string; previous?: string }> => {
-    const response = await apiClient.get(`/faculty/students/${studentId}/achievements/`, { params });
+    const response = await apiClient.get('/achievements/', { params: { ...params, user: studentId } });
     return response.data;
   },
   
   getStudentCertificates: async (studentId: number, params?: {
     page?: number;
-    verified?: boolean;
+    status?: string;
   }): Promise<{ results: Certificate[]; count: number; next?: string; previous?: string }> => {
-    const response = await apiClient.get(`/faculty/students/${studentId}/certificates/`, { params });
+    const response = await apiClient.get('/certificates/', { params: { ...params, user: studentId } });
     return response.data;
   },
   
   getStudentVolunteeringActivities: async (studentId: number, params?: {
     page?: number;
-    verified?: boolean;
+    status?: string;
   }): Promise<{ results: VolunteeringActivity[]; count: number; next?: string; previous?: string }> => {
-    const response = await apiClient.get(`/faculty/students/${studentId}/volunteering/`, { params });
+    const response = await apiClient.get('/volunteering/activities/', { params: { ...params, user: studentId } });
     return response.data;
+  },
+  
+  getReviewStats: async (): Promise<any> => {
+    const [achievements, certificates, volunteering] = await Promise.all([
+      apiClient.get('/achievements/stats/'),
+      apiClient.get('/certificates/stats/'),
+      apiClient.get('/volunteering/stats/')
+    ]);
+    
+    return {
+      achievements: achievements.data,
+      certificates: certificates.data,
+      volunteering: volunteering.data
+    };
   },
 };
 
 // User API
 export const userAPI = {
   getProfile: async (): Promise<UserProfile> => {
-    const response = await apiClient.get('/accounts/profile/');
+    const response = await apiClient.get('/auth/profile/');
     return response.data;
   },
   
   updateProfile: async (profileData: Partial<UserProfile>): Promise<UserProfile> => {
-    const response = await apiClient.patch('/accounts/profile/', profileData);
+    const response = await apiClient.patch('/auth/profile/', profileData);
     return response.data;
   },
   
   uploadProfilePicture: async (file: File): Promise<{ profile_picture: string }> => {
     const formData = new FormData();
     formData.append('profile_picture', file);
-    const response = await apiClient.patch('/accounts/profile/', formData, {
+    const response = await apiClient.patch('/auth/profile/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;

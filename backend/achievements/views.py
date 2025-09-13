@@ -1,7 +1,7 @@
 from rest_framework import generics, status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from django.db.models import Count, Q, Avg
+from django.db.models import Count, Q, Avg, Sum
 from django.utils import timezone
 from datetime import timedelta
 from .models import (
@@ -216,27 +216,31 @@ def achievement_stats(request):
     if user.is_student():
         # Student stats
         achievements = Achievement.objects.filter(user=user)
+        this_month = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         stats = {
             'total_achievements': achievements.count(),
             'approved_achievements': achievements.filter(status='approved').count(),
             'pending_achievements': achievements.filter(status='pending').count(),
             'rejected_achievements': achievements.filter(status='rejected').count(),
             'total_points': achievements.filter(status='approved').aggregate(
-                total=models.Sum('points')
+                total=Sum('points')
             )['total'] or 0,
+            'this_month_achievements': achievements.filter(created_at__gte=this_month).count(),
             'categories_count': achievements.values('category').distinct().count(),
             'badges_earned': UserBadge.objects.filter(user=user).count(),
         }
     else:
         # Admin/Faculty stats
+        this_month = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         stats = {
             'total_achievements': Achievement.objects.count(),
             'approved_achievements': Achievement.objects.filter(status='approved').count(),
             'pending_achievements': Achievement.objects.filter(status='pending').count(),
             'rejected_achievements': Achievement.objects.filter(status='rejected').count(),
             'total_points': Achievement.objects.filter(status='approved').aggregate(
-                total=models.Sum('points')
+                total=Sum('points')
             )['total'] or 0,
+            'this_month_achievements': Achievement.objects.filter(created_at__gte=this_month).count(),
             'categories_count': AchievementCategory.objects.filter(is_active=True).count(),
             'badges_earned': UserBadge.objects.count(),
         }
@@ -274,7 +278,7 @@ def achievement_analytics(request):
     # Top achievers
     top_achievers = []
     for user_achievement in Achievement.objects.filter(status='approved').values('user').annotate(
-        total_points=models.Sum('points')
+        total_points=Sum('points')
     ).order_by('-total_points')[:10]:
         user = User.objects.get(id=user_achievement['user'])
         top_achievers.append({

@@ -73,7 +73,7 @@ class AchievementCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Achievement
         fields = [
-            'title', 'description', 'category', 'priority', 'evidence_url',
+            'title', 'description', 'category', 'priority', 'points', 'evidence_url',
             'evidence_file', 'skills_gained', 'tags', 'is_public'
         ]
     

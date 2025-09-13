@@ -16,8 +16,9 @@ import {
 export const useAchievements = (params?: {
   page?: number;
   search?: string;
-  category?: string;
-  verified?: boolean;
+  category?: number;
+  status?: string;
+  user?: number;
 }) => {
   return useQuery({
     queryKey: ['achievements', params],
@@ -78,7 +79,9 @@ export const useDeleteAchievement = (options?: UseMutationOptions<void, Error, n
 export const useCertificates = (params?: {
   page?: number;
   search?: string;
-  verified?: boolean;
+  category?: number;
+  status?: string;
+  user?: number;
 }) => {
   return useQuery({
     queryKey: ['certificates', params],
@@ -139,8 +142,9 @@ export const useDeleteCertificate = (options?: UseMutationOptions<void, Error, n
 export const useVolunteeringActivities = (params?: {
   page?: number;
   search?: string;
-  category?: string;
-  verified?: boolean;
+  category?: number;
+  status?: string;
+  user?: number;
 }) => {
   return useQuery({
     queryKey: ['volunteering', params],
@@ -200,7 +204,10 @@ export const useDeleteVolunteeringActivity = (options?: UseMutationOptions<void,
 // Notifications hooks
 export const useNotifications = (params?: {
   page?: number;
-  unread_only?: boolean;
+  is_read?: boolean;
+  is_archived?: boolean;
+  priority?: string;
+  type?: number;
 }) => {
   return useQuery({
     queryKey: ['notifications', params],
@@ -278,5 +285,62 @@ export const useUploadProfilePicture = (options?: UseMutationOptions<{ profile_p
       options?.onSuccess?.(data, data, undefined);
     },
     ...options,
+  });
+};
+
+// Additional hooks for new features
+export const useAchievementCategories = () => {
+  return useQuery({
+    queryKey: ['achievement-categories'],
+    queryFn: () => achievementsAPI.getAchievementCategories(),
+  });
+};
+
+export const useAchievementStats = () => {
+  return useQuery({
+    queryKey: ['achievement-stats'],
+    queryFn: () => achievementsAPI.getAchievementStats(),
+  });
+};
+
+export const useCertificateCategories = () => {
+  return useQuery({
+    queryKey: ['certificate-categories'],
+    queryFn: () => certificatesAPI.getCertificateCategories(),
+  });
+};
+
+export const useCertificateStats = () => {
+  return useQuery({
+    queryKey: ['certificate-stats'],
+    queryFn: () => certificatesAPI.getCertificateStats(),
+  });
+};
+
+export const useVolunteeringCategories = () => {
+  return useQuery({
+    queryKey: ['volunteering-categories'],
+    queryFn: () => volunteeringAPI.getVolunteeringCategories(),
+  });
+};
+
+export const useVolunteeringStats = () => {
+  return useQuery({
+    queryKey: ['volunteering-stats'],
+    queryFn: () => volunteeringAPI.getVolunteeringStats(),
+  });
+};
+
+export const useNotificationStats = () => {
+  return useQuery({
+    queryKey: ['notification-stats'],
+    queryFn: () => notificationsAPI.getNotificationStats(),
+  });
+};
+
+export const useNotificationTypes = () => {
+  return useQuery({
+    queryKey: ['notification-types'],
+    queryFn: () => notificationsAPI.getNotificationTypes(),
   });
 };

@@ -9,6 +9,7 @@ import {
   Settings,
   Bell,
   Award,
+  BookOpen,
   FileText,
   Menu,
   X,
@@ -52,16 +53,16 @@ const Navigation = () => {
       badge: null 
     },
     { 
-      icon: Upload, 
-      label: "Upload Certificates", 
-      path: "/upload", 
-      badge: null 
-    },
-    { 
       icon: Award, 
       label: "Achievements", 
       path: "/achievements", 
       badge: "12" 
+    },
+    { 
+      icon: BookOpen, 
+      label: "Certificates", 
+      path: "/certificates", 
+      badge: null 
     },
     { 
       icon: FileText, 
@@ -155,7 +156,7 @@ const Navigation = () => {
               <User className="h-4 w-4 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{user?.full_name || 'Student'}</p>
+              <p className="text-sm font-medium truncate">{user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : 'Student'}</p>
               <p className="text-xs text-muted-foreground truncate">{user?.email || 'student@example.com'}</p>
             </div>
           </div>

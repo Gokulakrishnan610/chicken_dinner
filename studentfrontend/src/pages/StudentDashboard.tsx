@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { useAchievements, useVolunteeringActivities, useCreateVolunteeringActivity } from "@/hooks/useApi";
+import { useAchievements, useVolunteeringActivities, useCreateVolunteeringActivity, useAchievementStats, useVolunteeringStats } from "@/hooks/useApi";
+import { isDemoAccount, getMockData } from "@/utils/demoUtils";
 
 const StudentDashboard = () => {
   const [isVolunteeringModalOpen, setIsVolunteeringModalOpen] = useState(false);
@@ -18,6 +19,8 @@ const StudentDashboard = () => {
   // API hooks
   const { data: achievementsData, isLoading: achievementsLoading } = useAchievements({ page: 1 });
   const { data: volunteeringData, isLoading: volunteeringLoading } = useVolunteeringActivities({ page: 1 });
+  const { data: achievementStats } = useAchievementStats();
+  const { data: volunteeringStats } = useVolunteeringStats();
   const createVolunteeringMutation = useCreateVolunteeringActivity({
     onSuccess: () => {
       toast({
@@ -34,7 +37,8 @@ const StudentDashboard = () => {
     },
   });
 
-  const recentAchievements = [
+  // Mock data for demo accounts only
+  const mockRecentAchievements = [
     {
       id: 1,
       title: "AWS Cloud Practitioner",
@@ -69,11 +73,15 @@ const StudentDashboard = () => {
     },
   ];
 
-  const upcomingDeadlines = [
+  const mockUpcomingDeadlines = [
     { title: "Python Course Final Project", dueDate: "2024-02-01", priority: "high" },
     { title: "Data Science Certification", dueDate: "2024-02-05", priority: "medium" },
     { title: "Portfolio Website Update", dueDate: "2024-02-10", priority: "low" },
   ];
+
+  // Use mock data only for demo accounts, otherwise use real data
+  const recentAchievements = isDemoAccount(user) ? mockRecentAchievements : (achievementsData?.results || []);
+  const upcomingDeadlines = isDemoAccount(user) ? mockUpcomingDeadlines : [];
 
   const handleLogVolunteering = (data: any) => {
     createVolunteeringMutation.mutate(data);
@@ -188,7 +196,7 @@ const StudentDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="Total Achievements"
-          value={achievementsData?.count || 0}
+          value={achievementStats?.total_achievements || achievementsData?.count || 0}
           change={achievementsLoading ? "Loading..." : "+2 this month"}
           changeType="positive"
           icon={Award}
@@ -203,14 +211,14 @@ const StudentDashboard = () => {
         />
         <StatsCard
           title="Total Points"
-          value={achievementsData?.results?.reduce((sum, achievement) => sum + achievement.points, 0) || 0}
+          value={achievementStats?.total_points || achievementsData?.results?.reduce((sum, achievement) => sum + achievement.points, 0) || 0}
           change="+150 this month"
           changeType="positive"
           icon={Trophy}
         />
         <StatsCard
           title="Volunteering Hours"
-          value={volunteeringData?.results?.reduce((sum, activity) => sum + activity.hours, 0) || 0}
+          value={volunteeringStats?.total_hours || volunteeringData?.results?.reduce((sum, activity) => sum + activity.hours_volunteered, 0) || 0}
           change={volunteeringLoading ? "Loading..." : "+5 this week"}
           changeType="positive"
           icon={Users}
@@ -235,7 +243,7 @@ const StudentDashboard = () => {
             <div className="space-y-3">
               {achievementsLoading ? (
                 <div className="text-center py-4 text-muted-foreground">Loading achievements...</div>
-              ) : achievementsData?.results?.slice(0, 4).map((achievement) => (
+              ) : recentAchievements.slice(0, 4).map((achievement) => (
                 <div
                   key={achievement.id}
                   className="flex items-start gap-4 p-4 border rounded-lg hover:bg-accent/60 transition-all duration-200 hover:shadow-sm"
@@ -247,24 +255,24 @@ const StudentDashboard = () => {
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-sm leading-tight">{achievement.title}</p>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                      <span>{achievement.category}</span>
+                      <span>{achievement.category_name || achievement.type}</span>
                       <span>•</span>
-                      <span>{new Date(achievement.date_achieved).toLocaleDateString()}</span>
+                      <span>{new Date(achievement.created_at || achievement.date).toLocaleDateString()}</span>
                     </div>
                   </div>
 
                   <div className="flex flex-col items-end gap-1">
                     <Badge 
-                      variant={achievement.verified ? "default" : "secondary"}
+                      variant={achievement.status === "approved" ? "default" : "secondary"}
                       className="text-xs font-medium"
                     >
                       +{achievement.points} pts
                     </Badge>
                     <Badge 
-                      variant={achievement.verified ? "default" : "secondary"}
+                      variant={achievement.status === "approved" ? "default" : "secondary"}
                       className="text-xs"
                     >
-                      {achievement.verified ? "verified" : "pending"}
+                      {achievement.status}
                     </Badge>
                   </div>
                 </div>

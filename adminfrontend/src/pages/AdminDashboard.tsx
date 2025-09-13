@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { 
   Users, 
   TrendingUp, 
@@ -6,20 +5,16 @@ import {
   BookOpen, 
   Download, 
   FileText,
-  Settings,
-  BarChart3,
-  PieChart,
-  Calendar,
-  Filter
+  Settings
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatsCard from "@/components/StatsCard";
+import { isDemoAccount } from "@/utils/demoUtils";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
-  BarChart, 
-  Bar, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -28,15 +23,15 @@ import {
   PieChart as RechartsPieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
   Area,
   AreaChart
 } from 'recharts';
 
 const AdminDashboard = () => {
-  // Sample data for charts
-  const studentEngagementData = [
+  const { user } = useAuth();
+  
+  // Mock data for demo accounts only
+  const mockStudentEngagementData = [
     { month: 'Jan', active: 245, certificates: 89, projects: 34 },
     { month: 'Feb', active: 267, certificates: 102, projects: 41 },
     { month: 'Mar', active: 289, certificates: 118, projects: 38 },
@@ -45,7 +40,7 @@ const AdminDashboard = () => {
     { month: 'Jun', active: 334, certificates: 156, projects: 48 },
   ];
 
-  const skillMappingData = [
+  const mockSkillMappingData = [
     { name: 'Programming', value: 35, color: 'hsl(var(--primary))' },
     { name: 'Web Development', value: 28, color: 'hsl(var(--success))' },
     { name: 'Data Science', value: 18, color: 'hsl(var(--warning))' },
@@ -53,14 +48,14 @@ const AdminDashboard = () => {
     { name: 'Mobile Development', value: 7, color: 'hsl(var(--muted))' },
   ];
 
-  const achievementCategoriesData = [
+  const mockAchievementCategoriesData = [
     { category: 'Certifications', count: 234, percentage: 45 },
     { category: 'Projects', count: 156, percentage: 30 },
     { category: 'Courses', count: 89, percentage: 17 },
     { category: 'Volunteering', count: 42, percentage: 8 },
   ];
 
-  const users = [
+  const mockUsers = [
     { id: 1, name: "Sarah Johnson", role: "Student", department: "Computer Science", status: "active", joinDate: "2021-09-01" },
     { id: 2, name: "Dr. Michael Smith", role: "Faculty", department: "Computer Science", status: "active", joinDate: "2018-08-15" },
     { id: 3, name: "Emily Davis", role: "Student", department: "Information Technology", status: "active", joinDate: "2022-01-10" },
@@ -68,12 +63,19 @@ const AdminDashboard = () => {
     { id: 5, name: "Alex Rodriguez", role: "Student", department: "Computer Science", status: "inactive", joinDate: "2021-11-05" },
   ];
 
-  const reports = [
+  const mockReports = [
     { name: "NAAC Accreditation Report", type: "NAAC", lastGenerated: "2024-01-15", status: "ready" },
     { name: "NIRF Ranking Data", type: "NIRF", lastGenerated: "2024-01-10", status: "ready" },
     { name: "Student Achievement Summary", type: "Custom", lastGenerated: "2024-01-20", status: "ready" },
     { name: "Faculty Performance Report", type: "Custom", lastGenerated: "2024-01-18", status: "generating" },
   ];
+
+  // Use mock data only for demo accounts, otherwise use real data
+  const studentEngagementData = isDemoAccount(user) ? mockStudentEngagementData : [];
+  const skillMappingData = isDemoAccount(user) ? mockSkillMappingData : [];
+  const achievementCategoriesData = isDemoAccount(user) ? mockAchievementCategoriesData : [];
+  const users = isDemoAccount(user) ? mockUsers : [];
+  const reports = isDemoAccount(user) ? mockReports : [];
 
   const getRoleColor = (role: string) => {
     switch (role) {
